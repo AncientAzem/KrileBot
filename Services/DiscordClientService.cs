@@ -83,6 +83,14 @@ public class DiscordClientService : IHostedService
             var ctx = new SocketInteractionContext(_client, interaction);
             await _interactionService!.ExecuteCommandAsync(ctx, scope.ServiceProvider);
         };
+
+        _client!.MessageCommandExecuted += async interaction =>
+        {
+            var temp = await _client.Rest.GetGlobalApplicationCommands();
+            var scope = _serviceProvider!.CreateScope();
+            var ctx = new SocketInteractionContext(_client, interaction);
+            await _interactionService!.ExecuteCommandAsync(ctx, scope.ServiceProvider);
+        };
     }
 
     private static Task LogDiscordMessage(LogMessage message)
