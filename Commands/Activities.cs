@@ -6,29 +6,10 @@ namespace KrileDotNet.Commands;
 
 public class Activities : InteractionModuleBase<SocketInteractionContext>
 {
-    [SlashCommand("activities", "Starts an activity in a voice channel")]
-    public async Task StartActivity(ActivityList activity, [ChannelTypes(ChannelType.Voice)] IChannel channel)
+    [SlashCommand("activities", "[DEPRECATED] Starts an activity in a voice channel")]
+    public async Task StartActivity()
     {
-        try
-        {
-            var commandInteraction = (SocketSlashCommand)Context.Interaction;
-            var activitySelection = commandInteraction.Data.Options.First(c => c.Name == "activity").Value;
-
-            var voiceChannel = (SocketVoiceChannel)Context.Guild.GetChannel(channel.Id);
-            var invite = await voiceChannel.CreateInviteToApplicationAsync((ulong)activity, 7200);
-
-            var joinButton = new ButtonBuilder()
-                .WithStyle(ButtonStyle.Link)
-                .WithUrl(invite.Url)
-                .WithLabel("Join Activity");
-            var response = new ComponentBuilder().WithButton(joinButton);
-            await RespondAsync($"And we are good to go! To join the `{Helpers.FormatStringWithSpaces(activitySelection)}` activity in <#{voiceChannel.Id}>, please press the button below. Enjoy!", components: response.Build());
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(new LogMessage(LogSeverity.Error, "Commands", e.Message));
-            await RespondAsync("Unable to start activity. Please ensure I have permission to create invites.", ephemeral: true);
-        }
+        await RespondAsync("This command is not longer usable. Please support the official release and rollout of activities by discord.", ephemeral: true);
     }
 
     public enum ActivityList : ulong
