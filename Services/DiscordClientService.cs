@@ -16,12 +16,18 @@ public class DiscordClientService : IHostedService
     private static InteractionService? _interactionService;
     private static CommandService? _commandService;
     private static IServiceProvider? _serviceProvider;
+    private static HuntRelayService _huntRelayService;
 
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         if (_client is null)
         {
-            _client = new DiscordSocketClient();
+            var config = new DiscordSocketConfig()
+            {
+                GatewayIntents = GatewayIntents.All
+            };
+            
+            _client = new DiscordSocketClient(config);
             _client.Log += LogDiscordMessage;
             _client.Ready += ClientReady;
         }
@@ -41,6 +47,10 @@ public class DiscordClientService : IHostedService
             .AddSingleton(_commandService)
             .AddSingleton(_interactionService)
             .BuildServiceProvider();
+        
+        // Hunt Provider
+        // HuntRelayFormatter.Setup(827202823774666792, 1071183795585290290, 1016065075875938334); // Actual Server
+        
 
         var botToken = Environment.GetEnvironmentVariable("DISCORD_TOKEN");
         await _client.LoginAsync(TokenType.Bot, botToken);
@@ -70,6 +80,12 @@ public class DiscordClientService : IHostedService
                 await LogDiscordMessage(new LogMessage(LogSeverity.Info, "Startup", "Initializing Global Commands"));
                 await _interactionService.RegisterCommandsGloballyAsync();
             }
+            
+            // Setup Hunts
+            _huntRelayService = new HuntRelayService(ref _client,
+                ulong.Parse(Environment.GetEnvironmentVariable("RELAY_SERVER_ID")!), 
+                ulong.Parse(Environment.GetEnvironmentVariable("RELAY_CHANNEL_ID")!), 
+                ulong.Parse(Environment.GetEnvironmentVariable("SONAR_CHANNEL_ID")!));
         }
         catch (HttpException exception)
         {
@@ -90,6 +106,14 @@ public class DiscordClientService : IHostedService
             var scope = _serviceProvider!.CreateScope();
             var ctx = new SocketInteractionContext(_client, interaction);
             await _interactionService!.ExecuteCommandAsync(ctx, scope.ServiceProvider);
+        };
+
+        _client!.MessageReceived += async interaction =>
+        {
+            if (interaction.Channel.Id == ulong.Parse(Environment.GetEnvironmentVariable("SONAR_CHANNEL_ID")!))
+            {
+                await _huntRelayService.ProcessSonarReport(interaction.Content);
+            }
         };
     }
 

@@ -15,9 +15,9 @@ public class RandomSelection : InteractionModuleBase<SocketInteractionContext>
         try
         {
             var items = message.Content.ToLower().StartsWith("http")
-                ? await GetFromURL(message.Content)
+                ? await GetFromUrl(message.Content)
                 : await GetFromMessage(message.Content);
-            await RespondAsync($"Item Selected: `{items[Randomizer.Next((items.Count))]}`");
+            await RespondAsync($"Item Selected: `{items[Randomizer.Next((items.Count))]}`", ephemeral: true);
         }
         catch (Exception e)
         {
@@ -26,7 +26,7 @@ public class RandomSelection : InteractionModuleBase<SocketInteractionContext>
         }
     }
     
-    private async Task<List<string>> GetFromURL(string url)
+    private async Task<List<string>> GetFromUrl(string url)
     {
         try
         {
