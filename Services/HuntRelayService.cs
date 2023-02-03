@@ -23,15 +23,17 @@ public class HuntRelayService
      
      public async Task ProcessSonarReport(string msg)
      {
-          Console.WriteLine(new LogMessage(LogSeverity.Debug, "HuntRelayFormatter", msg));
-          string server = msg.Substring(msg.IndexOf('<') + 1, msg.IndexOf('>') - msg.IndexOf('<') - 1);
-          string rank = msg.Substring(17, 1);
-          string mobName = msg.Substring(20, msg.IndexOf('➲') - 21);
-          string location = msg.Substring(msg.IndexOf('➲') + 1, msg.IndexOf(')') - msg.IndexOf('➲') + 1);
-          string zone = location.Substring(0, location.IndexOf('(') -1);
-          string? expansion = Helpers.FFXIV_Zones
-               .FirstOrDefault(x => x.Value.Contains(zone)).Key;
+          if (!msg.Contains("was just killed"))
+          {
+               string server = msg.Substring(msg.IndexOf('<') + 1, msg.IndexOf('>') - msg.IndexOf('<') - 1);
+               string rank = msg.Substring(17, 1);
+               string mobName = msg.Substring(20, msg.IndexOf('➲') - 21);
+               string location = msg.Substring(msg.IndexOf('➲') + 1, msg.IndexOf(')') - msg.IndexOf('➲') + 1);
+               string zone = location.Substring(0, location.IndexOf('(') -1);
+               string? expansion = Helpers.FFXIV_Zones
+                    .FirstOrDefault(x => x.Value.Contains(zone)).Key;
           
-          this._relayChannel?.SendMessageAsync($"Expansion: {expansion ?? "Unknown"}\nServer: {server}\nMob Name: {mobName}\nLocation: {location}");
+               this._relayChannel?.SendMessageAsync($"Expansion: {expansion ?? "Unknown"}\nServer: {server}\nMob Name: {mobName}\nLocation: {location}");
+          }
      }
 }
