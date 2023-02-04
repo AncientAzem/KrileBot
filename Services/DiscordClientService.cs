@@ -112,6 +112,7 @@ public class DiscordClientService : IHostedService
         {
             if (interaction.Channel.Id == ulong.Parse(Environment.GetEnvironmentVariable("SONAR_CHANNEL_ID")!))
             {
+                await LogDiscordMessage(new LogMessage(LogSeverity.Debug, "MessageHandler", $"New Sonar Relay [Raw Data]: {interaction.Content}"));
                 await _huntRelayService.ProcessSonarReport(interaction.Content);
             }
         };

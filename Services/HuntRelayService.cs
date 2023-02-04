@@ -23,7 +23,7 @@ public class HuntRelayService
      
      public async Task ProcessSonarReport(string msg)
      {
-          if (!msg.Contains("was just killed"))
+          if (!msg.Contains("was just killed") && !msg.Contains("FATE"))
           {
                string server = msg.Substring(msg.IndexOf('<') + 1, msg.IndexOf('>') - msg.IndexOf('<') - 1);
                string rank = msg.Substring(17, 1);
