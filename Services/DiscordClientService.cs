@@ -93,21 +93,12 @@ public class DiscordClientService : IHostedService
             Console.WriteLine(json);
         }
 
-        _client!.SlashCommandExecuted += async interaction =>
+        _client!.InteractionCreated += async interaction =>
         {
-            var scope = _serviceProvider!.CreateScope();
             var ctx = new SocketInteractionContext(_client, interaction);
-            await _interactionService!.ExecuteCommandAsync(ctx, scope.ServiceProvider);
+            await _interactionService!.ExecuteCommandAsync(ctx, _serviceProvider);
         };
-
-        _client!.MessageCommandExecuted += async interaction =>
-        {
-            var temp = await _client.Rest.GetGlobalApplicationCommands();
-            var scope = _serviceProvider!.CreateScope();
-            var ctx = new SocketInteractionContext(_client, interaction);
-            await _interactionService!.ExecuteCommandAsync(ctx, scope.ServiceProvider);
-        };
-
+        
         _client!.MessageReceived += async interaction =>
         {
             if (interaction.Channel.Id == ulong.Parse(Environment.GetEnvironmentVariable("SONAR_CHANNEL_ID")!))
@@ -117,7 +108,6 @@ public class DiscordClientService : IHostedService
             }
         };
     }
-
     private static Task LogDiscordMessage(LogMessage message)
     {
         Console.WriteLine(message);
