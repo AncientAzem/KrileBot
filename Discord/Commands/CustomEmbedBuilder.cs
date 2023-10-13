@@ -1,9 +1,10 @@
-﻿using Discord;
+﻿using System.Diagnostics.CodeAnalysis;
+using Discord;
 using Discord.Interactions;
 
 namespace KrileDotNet.Commands;
 
-public abstract class CustomEmbedBuilder : InteractionModuleBase<SocketInteractionContext>
+public class CustomEmbedBuilder : InteractionModuleBase<SocketInteractionContext>
 {
     [SlashCommand("embed", "Create a custom embed in the current channel")]
     public async Task PromptForEmbedData()
@@ -44,18 +45,9 @@ public abstract class CustomEmbedBuilder : InteractionModuleBase<SocketInteracti
         await RespondAsync("Your embed has been created", ephemeral: true);
     }
 
-    public abstract class EmbedModal : IModal
+    public class EmbedModal : IModal
     {
-        protected EmbedModal(string msgTitle, string msgContent, string? msgLinkOne, string? msgLinkTwo, string? msgLinkThree)
-        {
-            MsgTitle = msgTitle;
-            MsgContent = msgContent;
-            MsgLinkOne = msgLinkOne;
-            MsgLinkTwo = msgLinkTwo;
-            MsgLinkThree = msgLinkThree;
-        }
-
-        public string Title => "Custom Embed Templet";
+        public string Title => "Custom Embed Template";
         
         [InputLabel("Message Title")]
         [ModalTextInput("msg_title", placeholder: "Hi there!")]
