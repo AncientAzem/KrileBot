@@ -14,7 +14,7 @@ public abstract class CustomEmbedBuilder : InteractionModuleBase<SocketInteracti
         }
         catch (Exception e)
         {
-            Console.WriteLine(new LogMessage(LogSeverity.Error, "Commands", e.Message));
+            await Helpers.LogMessage(LogSeverity.Error, "Commands", e.Message);
             await RespondAsync("Unable to create modal for embed creation", ephemeral: true);
         }
     }

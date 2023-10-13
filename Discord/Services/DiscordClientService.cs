@@ -74,13 +74,13 @@ public class DiscordClientService : IHostedService
             //Setup Guild Commands
             if (guildId is not null)
             {
-                await LogDiscordMessage(new LogMessage(LogSeverity.Info, "Startup", "Initializing Guild Commands"));
+                await Helpers.LogMessage(LogSeverity.Info, "Startup", "Initializing Guild Commands");
                 await _interactionService.RegisterCommandsToGuildAsync(Convert.ToUInt64(guildId));
             }
             //Setup Application Commands
             else
             {
-                await LogDiscordMessage(new LogMessage(LogSeverity.Info, "Startup", "Initializing Global Commands"));
+                await Helpers.LogMessage(LogSeverity.Info, "Startup", "Initializing Global Commands");
                 await _interactionService.RegisterCommandsGloballyAsync();
             }
             
@@ -94,7 +94,7 @@ public class DiscordClientService : IHostedService
             }
             catch (Exception e)
             {
-                await LogDiscordMessage(new LogMessage(LogSeverity.Warning, "Startup", "Unable to configure hunt relays. No relays will be sent if recieved."));
+                await Helpers.LogMessage(LogSeverity.Warning, "Startup", "Unable to configure hunt relays. No relays will be sent if received.");
             }
             
         }
@@ -114,14 +114,15 @@ public class DiscordClientService : IHostedService
         {
             if (interaction.Channel.Id == ulong.Parse(Environment.GetEnvironmentVariable("SONAR_CHANNEL_ID")!))
             {
-                await LogDiscordMessage(new LogMessage(LogSeverity.Debug, "MessageHandler", $"New Sonar Relay [Raw Data]: {interaction.Content}"));
+                await Helpers.LogMessage(LogSeverity.Debug, "MessageHandler", $"New Sonar Relay [Raw Data]: {interaction.Content}");
                 await _huntRelayService.ProcessSonarReport(interaction.Content);
             }
         };
     }
-    public static Task LogDiscordMessage(LogMessage message)
+
+    internal static Task LogDiscordMessage(LogMessage msg)
     {
-        Console.WriteLine(message);
+        Console.WriteLine(msg);
         return Task.CompletedTask;
     }
 }

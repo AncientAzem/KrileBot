@@ -21,7 +21,7 @@ public class RandomSelection : InteractionModuleBase<SocketInteractionContext>
         }
         catch (Exception e)
         {
-            Console.WriteLine(new LogMessage(LogSeverity.Error, "Commands", e.Message));
+            await Helpers.LogMessage(LogSeverity.Error, "Commands", e.Message);
             await RespondAsync("Unable to select a random item. Please you used this command on a message containing only a URL or a message with a comma delineated list.", ephemeral: true);
         }
     }
