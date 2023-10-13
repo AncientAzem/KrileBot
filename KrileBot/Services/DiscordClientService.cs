@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Discord;
 using Discord.Commands;
 using Discord.Interactions;
@@ -70,11 +70,14 @@ public class DiscordClientService : IHostedService
             await _client!.SetActivityAsync(new Game("Ejika's theories", ActivityType.Listening));
             await _interactionService!.AddModulesAsync(Assembly.GetEntryAssembly(), _serviceProvider);
             var guildId = Environment.GetEnvironmentVariable("GUILD_ID");
+            
+            //Setup Guild Commands
             if (guildId is not null)
             {
                 await LogDiscordMessage(new LogMessage(LogSeverity.Info, "Startup", "Initializing Guild Commands"));
                 await _interactionService.RegisterCommandsToGuildAsync(Convert.ToUInt64(guildId));
             }
+            //Setup Application Commands
             else
             {
                 await LogDiscordMessage(new LogMessage(LogSeverity.Info, "Startup", "Initializing Global Commands"));
@@ -82,10 +85,18 @@ public class DiscordClientService : IHostedService
             }
             
             // Setup Hunts
-            _huntRelayService = new HuntRelayService(ref _client,
-                ulong.Parse(Environment.GetEnvironmentVariable("RELAY_SERVER_ID")!), 
-                ulong.Parse(Environment.GetEnvironmentVariable("RELAY_CHANNEL_ID")!), 
-                ulong.Parse(Environment.GetEnvironmentVariable("SONAR_CHANNEL_ID")!));
+            try
+            {
+                _huntRelayService = new HuntRelayService(ref _client,
+                    ulong.Parse(Environment.GetEnvironmentVariable("RELAY_SERVER_ID")!), 
+                    ulong.Parse(Environment.GetEnvironmentVariable("RELAY_CHANNEL_ID")!), 
+                    ulong.Parse(Environment.GetEnvironmentVariable("SONAR_CHANNEL_ID")!));
+            }
+            catch (Exception e)
+            {
+                await LogDiscordMessage(new LogMessage(LogSeverity.Warning, "Startup", "Unable to configure hunt relays. No relays will be sent if recieved."));
+            }
+            
         }
         catch (HttpException exception)
         {
@@ -108,7 +119,7 @@ public class DiscordClientService : IHostedService
             }
         };
     }
-    private static Task LogDiscordMessage(LogMessage message)
+    public static Task LogDiscordMessage(LogMessage message)
     {
         Console.WriteLine(message);
         return Task.CompletedTask;
