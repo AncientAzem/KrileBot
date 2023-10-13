@@ -1,0 +1,7 @@
+#docker-compose.yml (Base)
+version: '3.4'
+services:
+  discord-bot:
+    build:
+      context: .
+      dockerfile: /Discord/Dockerfile
