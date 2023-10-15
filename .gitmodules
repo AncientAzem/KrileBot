@@ -1,0 +1,3 @@
+[submodule "Libraries/Saucy"]
+	path = Libraries/Saucy
+	url = git@github.com:Sn0wCrack/saucybot-discord.git
